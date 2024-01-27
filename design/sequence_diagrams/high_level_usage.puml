@@ -1,0 +1,70 @@
+@startuml High_Level
+
+actor Player
+participant GameClient
+participant GameBroker
+participant GameServer
+queue GameSaga #lightblue
+queue GameplaySaga #lightblue
+
+GameServer -> GameBroker: Register game with broker
+note over GameBroker
+    Registration requires authentication with the broker.
+    Most likely using certificate signing
+endnote
+
+Player -> GameClient: Load game client
+
+GameClient -> GameBroker: GET Available games
+GameBroker -> GameClient: Available games response
+GameClient -> GameClient: Display available games
+
+Player -> GameClient: Select game
+GameClient -> GameServer: Connect to game lobby
+
+group Connecting to a game [Hosting a game]
+    Player -> GameClient: Select 'Host new room'
+    GameClient -> GameServer: Create new room request
+    GameServer --> GameSaga **: Progress to <GameCreated> state
+    GameClient <- GameServer: New room created response [roomCode]
+    GameClient -> GameClient: Display room code and details
+else Joining a game
+    Player -> GameClient: Select 'Join room'
+    Player -> GameClient: Enter room code
+    GameClient -> GameServer: Connect to room request [roomCode]
+    GameClient <- GameServer: Connect to room response [roomDetails]
+    GameClient -> GameClient: Display room details
+end
+
+Player -> GameClient: Click 'Start game'
+GameClient -> GameServer: Game start request
+GameServer --> GameSaga: Progress to <GameplayStarted> state
+GameClient <- GameServer: Game started response
+
+group Gameplay round : [Repeat //n// times]
+    GameServer --> GameplaySaga **: Progress to <RoundStarted> state
+    
+    group Player turn : [Repeat //n// times]
+        GameServer --> GameplaySaga: Progress to <PlayerTurnStarted> state
+        Player -> GameClient: Trigger turn action
+        GameClient -> GameServer: Send turn action request
+        GameServer -> GameServer: Send turn action event
+        GameServer -> GameServer: Handle turn action event
+        GameServer -> GameClient: Update game state for all clients
+        GameServer --> GameplaySaga: Progress to <PlayerTurnEnded> state
+    end
+
+    GameServer --> GameplaySaga: Progress to <RoundEnded> state
+end
+
+GameServer --> GameSaga: Progress to <GameplayEnded> state
+GameServer -> GameServer: Score the game
+GameServer -> GameClient: Send game results to all clients
+GameServer --> GameSaga: Progress to <GameFinished> state
+
+Player -> GameClient: Acknowledge game results
+GameClient -> GameServer: Reconnect to game lobby
+
+
+
+@enduml
