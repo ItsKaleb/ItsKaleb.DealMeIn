@@ -1,0 +1,28 @@
+@startuml "Gameplay Saga"
+
+state RoundStarted
+state PlayerTurnStarted
+state PlayerTurnEnded
+state RoundEnded
+
+state MorePlayerTurnsChoice <<choice>>
+state MoreRoundsChoice <<choice>>
+
+[*] --> RoundStarted
+RoundStarted --> PlayerTurnStarted
+PlayerTurnStarted --> PlayerTurnEnded
+PlayerTurnEnded --> MorePlayerTurnsChoice
+
+MorePlayerTurnsChoice --> RoundEnded : No more turns
+MorePlayerTurnsChoice --> PlayerTurnStarted : Progress to next player turn
+
+RoundEnded --> MoreRoundsChoice
+MoreRoundsChoice --> [*] : No more rounds
+MoreRoundsChoice --> RoundStarted : Progress to next round
+
+RoundStarted : * RoundCounter
+PlayerTurnStarted : * PlayerId
+PlayerTurnEnded : * PlayerId
+RoundEnded : * RoundCounter
+
+@enduml

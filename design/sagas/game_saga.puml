@@ -1,0 +1,48 @@
+@startuml "Game Saga"
+
+[*] --> GameCreated
+GameCreated --> GameplayStarted
+GameplayStarted --> GameplayEnded
+GameplayEnded --> GameFinished
+
+state GameCreated {
+    
+}
+note right of GameCreated
+    * Configure game settings
+    * Wait for players to join
+endnote
+
+state GameplayStarted {
+    !include gameplay_saga.iuml
+}
+note right of GameplayStarted
+    * Main gameplay
+    ** Game can have multiple rounds
+    ** Rounds can have multiple turns
+    * Triggering events
+    ** OnRoundStart
+    ** OnTurnStart
+    ** OnTurnEnd
+    ** OnRoundEnd
+endnote
+
+state GameplayEnded {
+    [*] --> GameScored
+    GameScored --> GameResultsShared
+    GameResultsShared --> [*]
+}
+note right of GameplayEnded
+    * End of game events
+    ** Scoring
+    ** Socials?
+endnote
+
+state GameFinished {
+
+}
+note right of GameFinished
+    * Return players to lobby
+endnote
+
+@enduml
