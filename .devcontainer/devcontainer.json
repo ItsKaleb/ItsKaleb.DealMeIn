@@ -1,7 +1,7 @@
 {
     "name": "ItsKaleb.DealMeIn",
     "dockerComposeFile": "docker-compose.yml",
-    "service": "ubuntu",
+    "service": "dev-box",
     "workspaceFolder": "/workspace",
 
     "forwardPorts": [
