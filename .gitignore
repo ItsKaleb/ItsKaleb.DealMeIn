@@ -2,4 +2,4 @@
 
 src/*/bin
 src/*/obj
-src/*/wwwroot/lib
+src/*/wwwroot
