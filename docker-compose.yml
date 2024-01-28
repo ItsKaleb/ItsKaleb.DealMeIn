@@ -1,0 +1,76 @@
+version: '3.4'
+
+services:
+  dealmein.gameserver.application:
+    image: ${DOCKER_REGISTRY-}dealmeingameserverapplication
+    build:
+      context: .
+      dockerfile: src/DealMeIn.GameServer.Application/Dockerfile
+    networks:
+      - game_server_infra
+      - services
+
+  dealmein.gameserver.rabbitmq:
+    image: rabbitmq:3-management
+    container_name: dmi-gs-mq
+    hostname: dmi-gs-mq
+    volumes:
+      - ./.containers/gs/queue/data/:/var/lib/rabbitmq
+      - ./.containers/gs/queue/log/:/var/log/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+        RABBITMQ_DEFAULT_USER: guest
+        RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - game_server_infra
+
+  dealmein.gameserver.postgres:
+    image: postgres:latest
+    container_name: dmi-gs-db
+    hostname: dmi-gs-db
+    volumes:
+      - ./.containers/gs/db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=gameserver
+      - POSTGRES_USER=postgres_gs
+      - POSTGRES_PASSWORD=postgres_gs
+    networks:
+      - game_server_infra
+
+  dealmein.gamebroker.application:
+    image: ${DOCKER_REGISTRY-}dealmeingamebrokerapplication
+    build:
+      context: .
+      dockerfile: src/DealMeIn.GameBroker.Application/Dockerfile
+    networks:
+      - game_broker_infra
+      - services
+
+  dealmein.gamebroker.postgres:
+    image: postgres:latest
+    container_name: dmi-gb-db
+    hostname: dmi-gb-db
+    volumes:
+      - ./.containers/gb/db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=gamebroker
+      - POSTGRES_USER=postgres_gb
+      - POSTGRES_PASSWORD=postgres_gb
+    networks:
+      - game_broker_infra
+
+
+networks:
+  services:
+    driver: bridge
+  game_server_infra:
+    internal: true
+  game_broker_infra:
+    internal: true
+

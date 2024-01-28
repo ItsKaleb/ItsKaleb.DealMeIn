@@ -5,25 +5,30 @@ VisualStudioVersion = 17.8.34408.163
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3593A66E-08C5-4FFB-964D-28E64CCBC2A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DealMeIn.GameClient.Application", "src\DealMeIn.GameClient.Application\DealMeIn.GameClient.Application.csproj", "{FF11520F-A641-4BB4-BA19-1E1DC610F007}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DealMeIn.GameClient.Application", "src\DealMeIn.GameClient.Application\DealMeIn.GameClient.Application.csproj", "{FF11520F-A641-4BB4-BA19-1E1DC610F007}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DealMeIn.Blazor", "src\DealMeIn.Blazor\DealMeIn.Blazor.csproj", "{B9DA2C74-11D7-4E8D-9E59-CBF13170F86E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DealMeIn.Blazor", "src\DealMeIn.Blazor\DealMeIn.Blazor.csproj", "{B9DA2C74-11D7-4E8D-9E59-CBF13170F86E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DealMeIn.Core", "src\DealMeIn.Core\DealMeIn.Core.csproj", "{B547DCA5-2074-4029-A59E-508061627D4F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DealMeIn.Abstractions", "src\DealMeIn.Abstractions\DealMeIn.Abstractions.csproj", "{081D5CE8-E54D-49A5-ACA4-8B8CF20F9B44}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DealMeIn.Abstractions", "src\DealMeIn.Abstractions\DealMeIn.Abstractions.csproj", "{081D5CE8-E54D-49A5-ACA4-8B8CF20F9B44}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DealMeIn.GameServer.Application", "src\DealMeIn.GameServer.Application\DealMeIn.GameServer.Application.csproj", "{6E64EC42-D5FB-435E-ABB8-5DC523E4DB15}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DealMeIn.GameServer.Application", "src\DealMeIn.GameServer.Application\DealMeIn.GameServer.Application.csproj", "{6E64EC42-D5FB-435E-ABB8-5DC523E4DB15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DealMeIn.GameServer.SignalR", "src\DealMeIn.GameServer.SignalR\DealMeIn.GameServer.SignalR.csproj", "{02657170-0967-4C9F-BBA0-FA89934201A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DealMeIn.GameServer.SignalR", "src\DealMeIn.GameServer.SignalR\DealMeIn.GameServer.SignalR.csproj", "{02657170-0967-4C9F-BBA0-FA89934201A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DealMeIn.GameServer.Models", "src\DealMeIn.GameServer.Models\DealMeIn.GameServer.Models.csproj", "{77F75E64-18BA-4429-820A-8CD20BB56E49}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DealMeIn.GameServer.Models", "src\DealMeIn.GameServer.Models\DealMeIn.GameServer.Models.csproj", "{77F75E64-18BA-4429-820A-8CD20BB56E49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DealMeIn.GameBroker.Application", "src\DealMeIn.GameBroker.Application\DealMeIn.GameBroker.Application.csproj", "{83D23BB1-519E-4F12-B269-653DD168C1D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DealMeIn.GameBroker.Application", "src\DealMeIn.GameBroker.Application\DealMeIn.GameBroker.Application.csproj", "{83D23BB1-519E-4F12-B269-653DD168C1D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DealMeIn.GameBroker.Models", "src\DealMeIn.GameBroker.Models\DealMeIn.GameBroker.Models.csproj", "{B65C5207-41B1-42A7-A119-FAD14F6EACEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DealMeIn.GameBroker.Models", "src\DealMeIn.GameBroker.Models\DealMeIn.GameBroker.Models.csproj", "{B65C5207-41B1-42A7-A119-FAD14F6EACEF}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{52EDC6CB-448B-4CFF-9983-1FEEE2BDCBAE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E01A72DF-D289-4C86-956E-3A9362F3E465}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Packages.props = Directory.Packages.props
+	EndProjectSection
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{A79647A4-8D6D-4389-A7D8-0A0B2ABC3DF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,10 +72,10 @@ Global
 		{B65C5207-41B1-42A7-A119-FAD14F6EACEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B65C5207-41B1-42A7-A119-FAD14F6EACEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B65C5207-41B1-42A7-A119-FAD14F6EACEF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{52EDC6CB-448B-4CFF-9983-1FEEE2BDCBAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{52EDC6CB-448B-4CFF-9983-1FEEE2BDCBAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{52EDC6CB-448B-4CFF-9983-1FEEE2BDCBAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{52EDC6CB-448B-4CFF-9983-1FEEE2BDCBAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A79647A4-8D6D-4389-A7D8-0A0B2ABC3DF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A79647A4-8D6D-4389-A7D8-0A0B2ABC3DF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A79647A4-8D6D-4389-A7D8-0A0B2ABC3DF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A79647A4-8D6D-4389-A7D8-0A0B2ABC3DF6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

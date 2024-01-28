@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -12,8 +12,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
+    <PackageReference Include="Rebus.PostgreSql" />
+    <PackageReference Include="Rebus.RabbitMq" />
+    <PackageReference Include="Rebus.ServiceProvider" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DealMeIn.Abstractions\DealMeIn.Abstractions.csproj" />
     <ProjectReference Include="..\DealMeIn.GameServer.Models\DealMeIn.GameServer.Models.csproj" />
     <ProjectReference Include="..\DealMeIn.GameServer.SignalR\DealMeIn.GameServer.SignalR.csproj" />
   </ItemGroup>

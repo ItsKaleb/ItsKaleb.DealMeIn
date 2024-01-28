@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="GameLogic\" />
+    <PackageReference Include="Rebus" />
   </ItemGroup>
 
 </Project>

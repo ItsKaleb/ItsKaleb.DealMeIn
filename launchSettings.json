@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "dealmein.gameserver.application": "StartDebugging",
+        "dealmein.gamebroker.application": "StartDebugging"
+      }
+    }
+  }
+}
