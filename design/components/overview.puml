@@ -1,0 +1,109 @@
+@startuml "Component overview"
+
+hide members
+
+json legend{
+    "A": "API",
+    "B": "Blazor Application",
+    "D": "Database",
+    "L": "Class Library",
+    "P": "Packaged DLL",
+    "R": "Razor Library"
+}
+
+package DealMeIn.Core <<Domain>> {
+    class DealMeIn.Core.Cards << (L,Yellow) >>
+    class DealMeIn.Core.Dice << (L,Yellow) >>
+    class DealMeIn.Core.Tokens << (L,Yellow) >>
+    class DealMeIn.Core.Boards << (L,Yellow) >>
+    class DealMeIn.Core.Playmats << (L,Yellow) >>
+}
+
+package DealMeIn.Abstractions <<Domain>> {
+    class DealMeIn.Abstractions.GameLogic << (L,Yellow) >>
+}
+
+package DealMeIn.GameClient <<Presentation>> {
+    class DealMeIn.GameClient.Application << (B,Orange) >>
+}
+
+package DealMeIn.Blazor <<Presentation>> {
+    class DealMeIn.Blazor.Cards << (R,Lavender) >>
+    class DealMeIn.Blazor.Dice << (R,Lavender) >>
+    class DealMeIn.Blazor.Tokens << (R,Lavender) >>
+    class DealMeIn.Blazor.Boards << (R,Lavender) >>
+    class DealMeIn.Blazor.Playmats << (R,Lavender) >>
+}
+
+package DealMeIn.GameServer <<Application>> {
+    class DealMeIn.GameServer.Application << (A,Green) >>
+    class DealMeIn.GameServer.Models << (L,Yellow) >>
+    class DealMeIn.GameServer.SignalR << (L,Yellow) >>
+}
+
+package DealMeIn.GameBroker <<Infrastructure>> {
+    class DealMeIn.GameBroker.Application << (A,Green) >>
+    class DealMeIn.GameBroker.Models << (L,Yellow) >>
+}
+
+package DealMeIn.Other <<Infrastructure>> {
+    package GameRegistry <<Database>> {
+        class "PostgreSQL" << (D,LightBlue) >>
+    }
+
+    package GameState <<Database>> {
+        class "PostgreSQL" << (D,LightBlue) >>
+    }
+
+    package Messaging <<Database>> {
+        class "Redis" << (D,LightBlue) >>
+    }
+
+    class "Discord OpenID Connect" as DiscordOIDC << (A,Green) >>
+    class DealMeIn.Other.GameDll << (P,LightPink) >>
+}
+
+' Authentication
+DealMeIn.GameClient.Application ..> DiscordOIDC : uses
+DealMeIn.GameServer.Application ..> DiscordOIDC : uses
+
+' Backend datastores
+DealMeIn.GameBroker.Application ..> GameRegistry : uses
+DealMeIn.GameServer.Application ..> GameState : uses
+DealMeIn.GameServer.Application ..> Messaging : uses
+
+' API communications
+DealMeIn.GameClient.Application --> DealMeIn.GameBroker.Application
+DealMeIn.GameClient.Application --> DealMeIn.GameServer.Application
+
+' Library cross-usage
+DealMeIn.GameBroker.Application o-- DealMeIn.GameBroker.Models
+
+DealMeIn.GameServer.Application *-- DealMeIn.Other.GameDll
+DealMeIn.Other.GameDll <|-- DealMeIn.Abstractions.GameLogic
+
+DealMeIn.GameServer.Application o-- DealMeIn.GameServer.Models
+DealMeIn.GameServer.Application o-- DealMeIn.GameServer.SignalR
+
+DealMeIn.GameClient.Application o-- DealMeIn.GameBroker.Models
+DealMeIn.GameClient.Application o-- DealMeIn.GameServer.Models
+DealMeIn.GameClient.Application o-- DealMeIn.GameServer.SignalR
+DealMeIn.GameClient.Application o-- DealMeIn.Blazor.Cards
+DealMeIn.GameClient.Application o-- DealMeIn.Blazor.Dice
+DealMeIn.GameClient.Application o-- DealMeIn.Blazor.Tokens
+DealMeIn.GameClient.Application o-- DealMeIn.Blazor.Playmats
+DealMeIn.GameClient.Application o-- DealMeIn.Blazor.Boards
+
+DealMeIn.Blazor.Cards o-- DealMeIn.Core.Cards
+DealMeIn.Blazor.Dice o-- DealMeIn.Core.Dice
+DealMeIn.Blazor.Tokens o-- DealMeIn.Core.Tokens
+DealMeIn.Blazor.Playmats o-- DealMeIn.Core.Playmats
+DealMeIn.Blazor.Boards o-- DealMeIn.Core.Boards
+
+DealMeIn.Abstractions.GameLogic o-- DealMeIn.Core.Cards
+DealMeIn.Abstractions.GameLogic o-- DealMeIn.Core.Dice
+DealMeIn.Abstractions.GameLogic o-- DealMeIn.Core.Tokens
+DealMeIn.Abstractions.GameLogic o-- DealMeIn.Core.Playmats
+DealMeIn.Abstractions.GameLogic o-- DealMeIn.Core.Boards
+
+@enduml
