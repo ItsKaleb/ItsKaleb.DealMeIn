@@ -1,0 +1,99 @@
+@startuml "Domain Events"
+
+actor Player
+participant GameClient
+box GameServer
+    participant LobbyHub << (C,#ADD1B2) >>
+    participant RoomsService << (C,#ADD1B2) >>
+    database RoomsRepository #LightYellow
+    queue GameLogicSaga #LightBlue
+    participant PublicRoomCreatedHandler << (C,#ADD1B2) >>
+    participant RoomStateUpdatedHandler << (C,#ADD1B2) >>
+end box
+
+== Initial Connect ==
+
+GameClient -> LobbyHub++: [CONNECT]
+LobbyHub -> RoomsService++: Get all public rooms
+RoomsService -> RoomsRepository++: Get all public rooms
+RoomsService <- RoomsRepository--: Available public rooms
+LobbyHub <- RoomsService--: Available public rooms
+GameClient <- LobbyHub--: Available public rooms
+
+== Create Room ==
+
+' Player triggers room creation
+Player -> GameClient: Click 'create new room'
+
+' LobbyHub handles request to create new room
+activate LobbyHub
+    GameClient -> LobbyHub: [POST] /lobby/rooms
+    LobbyHub -> RoomsService: Request new room
+
+    ' Room is created
+    activate RoomsService
+        RoomsService -> RoomsService: Create new room with \nowner set to Player
+        RoomsService -> RoomsRepository: Persist room to repository
+        RoomsService --> GameLogicSaga++: GameRoomCreatedEvent
+        RoomsService -> LobbyHub: RoomDTO
+    deactivate RoomsService
+
+    ' Client is redirected to the new room
+    GameClient <- LobbyHub: [CREATEDAT] /lobby/rooms/{roomId}/join
+    GameClient -> GameClient: [REDIRECT] /lobby/rooms/{roomId}/join 
+deactivate LobbyHub
+
+' Handle GameRoomCreatedEvent
+group IsRoomPublic = true
+activate PublicRoomCreatedHandler
+    GameLogicSaga --> PublicRoomCreatedHandler: Handles\n<GameRoomCreatedEvent>
+    PublicRoomCreatedHandler -> PublicRoomCreatedHandler: Check if created \ngame is public
+    PublicRoomCreatedHandler -> PublicRoomCreatedHandler: OnPublicRoomsListUpdated()
+    
+    PublicRoomCreatedHandler -->> LobbyHub++: Trigger registered callback
+    LobbyHub -> RoomsService++: Get all public rooms
+    RoomsService -> RoomsRepository++: Get all public rooms
+    RoomsService <- RoomsRepository--: Available public rooms
+    LobbyHub <- RoomsService--: Available public rooms
+    GameClient <- LobbyHub--: Refresh available public rooms \n(all clients)
+deactivate PublicRoomCreatedHandler
+end
+deactivate GameLogicSaga
+
+== Join Room ==
+group Join Room [Public room]
+    Player -> GameClient: Select an available public room
+    Player -> GameClient: Click 'join room'
+
+    GameClient -> LobbyHub: [POST] /lobby/rooms/{roomId}/join
+    LobbyHub -> RoomsService: Add player to room
+    RoomsService --> GameLogicSaga++: GameRoomPlayerJoinedEvent
+else [Private room]
+    Player -> GameClient: Click 'join room with code'
+    Player -> GameClient: Enter room code
+
+    GameClient -> LobbyHub: [POST] /lobby/rooms{roomId}/join \nwith room code
+    LobbyHub -> RoomsService++: Add player to room \nwith room code
+    RoomsService -> RoomsService: Verify room code
+    RoomsService --> GameLogicSaga: GameRoomPlayerJoinedEvent
+    deactivate RoomsService
+end
+
+== Leave Room ==
+
+Player -> GameClient: Click 'leave room'
+GameClient -> LobbyHub: [DELETE] /lobby/rooms/{roomId}/join
+LobbyHub -> RoomsService: Remove player from room
+RoomsService --> GameLogicSaga: GameRoomPlayerLeftEvent
+
+== Room State Updated ==
+
+activate RoomStateUpdatedHandler
+    GameLogicSaga --> RoomStateUpdatedHandler: Handles<GameRoomPlayerJoinedEvent> \nHandles<GameRoomPlayerLeftEvent>
+    RoomStateUpdatedHandler -> RoomStateUpdatedHandler: Check if there are enough \nplayers to start the game
+    RoomStateUpdatedHandler -> RoomStateUpdatedHandler: OnRoomStateChanged()
+    RoomStateUpdatedHandler -->> LobbyHub++: Trigger registered callback
+    GameClient <- LobbyHub--: Refresh room details/state
+deactivate RoomStateUpdatedHandler
+
+@enduml
