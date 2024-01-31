@@ -1,0 +1,47 @@
+@startuml "Start amd Play Game"
+
+actor Player
+participant GameClient
+rectangle GameServer {
+	participant GameHub << (C,#ADDA8A) >>
+	participant RoomMarshalHandler << (C,#ADDA8A) >>
+	queue GameRoomSaga #LightBlue
+	queue GameLogicSaga #LightBlue
+	database GameStateRepository #LightYellow
+}
+
+rectangle GameLogic.dll {
+	participant GameSetupHandler << (C,#ADDA8A) >>
+	participnt GameStepHandler << (C,#ADDA8A) >>
+}
+
+== Start Game ==
+
+Player -> GameClient: Click "start game"
+activate GameHub
+	GameClient -> GameHub: [POST] /game/start/{roomId}
+	GameHub -> GamesService: StartGame(roomId)
+	GamesService --> GameRoomSaga: GameStartedEvent
+	
+	' Game setup
+	GameRoomSaga --> GameSetupHandler: Handles<GameStartedEvent>
+	activate GameSetupHandler
+		GameSetupHandler -> GameStateRepository: StoreGameState(roomId, gameStateDto)
+		GameSetupHandler --> GameLogicSaga: GameStepCompletedEvent (gameStep=setup)
+	deactivate GameSetupHandler
+
+	' Marshal players in room
+	GameRoomSaga --> RoomMarshalHandler: Handles<GameStartedEvent>
+	activate RoomMarshalHandler
+		RoomMarshalHandler -> GameHub: SendAll(roomId) - Move into active game
+	deactivate RoomMarshalHandler
+deactivate GameHub
+
+== Gameplay ==
+
+group as "loop"
+	GameLogicSaga --> GameStepHandler: Handles<GameStepCompletedEvent>
+	
+endgroup
+
+@enduml
