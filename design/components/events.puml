@@ -1,0 +1,149 @@
+@startuml "Events"
+
+hide empty members
+left to right direction
+
+' Core
+package Core {
+    class CardsService<<TCard>> {
+        -_randomProvider: IRandomProvider
+        +DrawCard(count:int): IEnumerable<TCard>
+        +ShuffleDeck()
+        -OnDiscard()
+    }
+
+    class DiceService<<TDice>> {
+        -_randomProvider: IRandomProvider
+        +RollDice(count:int): IEnumerable<TDice>
+    }
+}
+
+' Abstractions
+package Abstractions {
+    abstract AbstractScoreCard
+    abstract AbstractGameAction
+    abstract AbstractGameRound
+    abstract AbstractScoringGameRound
+    AbstractScoringGameRound "extends" --|> AbstractGameRound
+}
+
+' GameServer
+package GameServer{
+    class GameHub
+}
+
+
+
+' ==============
+'     Events
+' ==============
+
+!procedure newGameLogicEvent($eventName)
+    $eventName "implements" --|> IGameLogicEvent
+    class $eventName {
+        +roomId
+    }
+!endprocedure
+
+!procedure newEventHandler($handlerName, $eventName)
+    $handlerName "handles" -- $eventName
+    class $handlerName {
+        #Handle<$eventName>()
+    }
+!endprocedure
+
+package "Core_Events" {
+    interface IGameLogicEvent
+
+    ' Game Created
+    newGameLogicEvent(GameRoomOpenedEvent)
+    class GameRoomOpenedEvent {
+        -isPrivate: bool
+    }
+
+    ' Game Started
+    newGameLogicEvent(GameStartedEvent)
+    class GameStartedEvent {
+
+    }
+    GameHub "produces" -- GameStartedEvent
+
+    ' Game Action Performed
+    newGameLogicEvent(GameActionPerformedEvent)
+    class GameActionPerformedEvent {
+        -actionDetails: AbstractGameAction
+    }
+    CardsService "produces" -- GameActionPerformedEvent
+    DiceService "produces" -- GameActionPerformedEvent
+    GameHub "produces" -- GameActionPerformedEvent
+    GameActionPerformedEvent *-- "1" AbstractGameAction
+
+    ' Game State Changed
+    newGameLogicEvent(GameStateChangedEvent)
+    class GameStateChangedEvent {
+        -gameState: GameStateDto
+    }
+
+    ' Game Finished
+    newGameLogicEvent(GameFinishedEvent)
+    class GameFinishedEvent {
+
+    }
+
+    ' Game Scoring Completed
+    newGameLogicEvent(GameScoringCompletedEvent)
+    class GameScoringCompletedEvent {
+        -scoreCard: AbstractScoreCard
+    }
+    GameScoringCompletedEvent *-- "1" AbstractScoreCard
+    AbstractScoringGameRound "produces" -- GameScoringCompletedEvent
+
+    ' Game Destroyed
+    newGameLogicEvent(GameRoomClosedEvent)
+    class GameRoomClosedEvent {
+
+    }
+}
+
+package GameServer {
+    newEventHandler(GameRoomSaga, GameRoomOpenedEvent)
+    newEventHandler(GameRoomSaga, GameStartedEvent)
+    newEventHandler(GameRoomSaga, GameFinishedEvent)
+    newEventHandler(GameRoomSaga, GameRoomClosedEvent)
+    class GameRoomSaga {
+
+    }
+
+    newEventHandler(GameStateChangedHandler, GameStateChangedEvent)
+    class GameStateChangedHandler {
+        -SendCurrentGameState()
+    }
+    GameStateChangedHandler -u- GameHub
+
+    newEventHandler(GameScorePublishHandler, GameScoringCompletedEvent)
+    class GameScorePublishHandler {
+        -_gameHub: GameHub
+    }
+    GameScorePublishHandler -u- GameHub
+}
+
+' CustomGameLogic
+package CustomGameLogic{
+    newEventHandler(GameRoundHandler, GameActionPerformedEvent)
+    class GameRoundHandler {
+        -_gameRounds: Stack<AbstractGameRound>
+    }
+    GameRoundHandler -- AbstractGameRound
+    GameRoundHandler "produces" -- GameStateChangedEvent
+    GameRoundHandler "produces" -- GameFinishedEvent
+
+    class ScoreCard {
+        +ScoreGame()
+    }
+    ScoreCard "extends" --|> AbstractScoreCard
+}
+
+' hide Core
+' hide Abstractions
+
+@enduml
