@@ -2,18 +2,20 @@
 
 actor Player
 participant GameClient
-rectangle GameServer {
+box GameServer
 	participant GameHub << (C,#ADDA8A) >>
 	participant RoomMarshalHandler << (C,#ADDA8A) >>
+	participant GamesService << (C,#ADDA8A) >>
 	queue GameRoomSaga #LightBlue
 	queue GameLogicSaga #LightBlue
 	database GameStateRepository #LightYellow
-}
+end box
 
-rectangle GameLogic.dll {
+box "GameLogic.dll"
 	participant GameSetupHandler << (C,#ADDA8A) >>
-	participnt GameStepHandler << (C,#ADDA8A) >>
-}
+	participant GameStepHandler << (C,#ADDA8A) >>
+	participant GameLogicService << (C,#ADDA8A) >>
+end box
 
 == Start Game ==
 
@@ -26,22 +28,47 @@ activate GameHub
 	' Game setup
 	GameRoomSaga --> GameSetupHandler: Handles<GameStartedEvent>
 	activate GameSetupHandler
+		GameSetupHandler -> GameSetupHandler: Perform game setup
 		GameSetupHandler -> GameStateRepository: StoreGameState(roomId, gameStateDto)
 		GameSetupHandler --> GameLogicSaga: GameStepCompletedEvent (gameStep=setup)
 	deactivate GameSetupHandler
 
 	' Marshal players in room
-	GameRoomSaga --> RoomMarshalHandler: Handles<GameStartedEvent>
 	activate RoomMarshalHandler
-		RoomMarshalHandler -> GameHub: SendAll(roomId) - Move into active game
+		GameRoomSaga --> RoomMarshalHandler: Handles<GameStartedEvent>
+		RoomMarshalHandler -> GameHub: SendAll(roomId) \n- Move into active game
+		GameLogicSaga --> RoomMarshalHandler: Handles<GameStepCompletedEvent>
+		RoomMarshalHandler -> GameHub: SendAll(roomId) \n- Update game state for all clients
 	deactivate RoomMarshalHandler
+
+	GameHub -> GameStateRepository: Get current game state
+	GameHub <- GameStateRepository: gameStateDto
+	GameHub -> GameClient: Send updated game state to clients
 deactivate GameHub
 
 == Gameplay ==
 
-group as "loop"
+group loop
 	GameLogicSaga --> GameStepHandler: Handles<GameStepCompletedEvent>
-	
-endgroup
+	GameStepHandler -> GameLogicService: OnGameStep(gameStepCounter)
+	GameLogicService -> GameLogicService
+	note left
+		Perform actions for 
+		current game step
+		including wait for
+		player input
+	endnote
+	GameLogicService -> GameStateRepository: StoreGameState(roomId, gameStateDto)
+	GameLogicService --> GameLogicSaga: GameStepCompleted
+
+	activate RoomMarshalHandler
+		GameLogicSaga --> RoomMarshalHandler: Handles<GameStepCompletedEvent>
+		RoomMarshalHandler -> GameHub: SendAll(roomId) \n- Update game state for all clients
+	deactivate RoomMarshalHandler
+
+	GameHub -> GameStateRepository: Get current game state
+	GameHub <- GameStateRepository: gameStateDto
+	GameHub -> GameClient: Send updated game state to clients
+end
 
 @enduml
