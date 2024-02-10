@@ -19,3 +19,9 @@ A .Net application using SignalR to host one or more game rooms for a specific g
 This project uses is to be hosted in a Docker container, with the published `.dll` and asset files for a particular game injected.
 
 One game server instance hosts one specific game.
+
+## Local Setup
+
+Requires:
+* Docker
+* Add the following line to your `C:\Windows\System32\etc\hosts` file: `127.0.0.1 dealmein.local`

@@ -1,0 +1,29 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+# GameServer
+- name: GameServer
+  host: dmi-gs-app
+  port: 8081
+  protocol: https
+  routes:
+  - name: GameServer
+    hosts:
+    - dealmein.local
+    paths:
+    - /gameserver
+    strip_path: true
+
+# GameBroker
+- name: GameBroker
+  host: dmi-gb-app
+  port: 8081
+  protocol: https
+  routes:
+  - name: GameBroker
+    hosts:
+    - dealmein.local
+    paths:
+    - /gamebroker
+    strip_path: true

@@ -1,48 +1,67 @@
 version: '3.4'
 
 services:
+  # GameServer App
   dealmein.gameserver.application:
     image: ${DOCKER_REGISTRY-}dealmeingameserverapplication
+    hostname: dmi-gs-app
     build:
       context: .
       dockerfile: src/DealMeIn.GameServer.Application/Dockerfile
+    depends_on:
+      dealmein.gameserver.rabbitmq:
+        condition: service_healthy
+      dealmein.gameserver.postgres:
+        condition: service_healthy
     networks:
       - game_server_infra
       - services
 
+  # GameServer RabbitMq
   dealmein.gameserver.rabbitmq:
     image: rabbitmq:3-management
-    container_name: dmi-gs-mq
     hostname: dmi-gs-mq
     volumes:
       - ./.containers/gs/queue/data/:/var/lib/rabbitmq
       - ./.containers/gs/queue/log/:/var/log/rabbitmq
     ports:
-      - 5672:5672
-      - 15672:15672
+      - 57102:5672
+      - 57103:15672
     environment:
         RABBITMQ_DEFAULT_USER: guest
         RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - game_server_infra
 
+  # GameServer Postgres
   dealmein.gameserver.postgres:
     image: postgres:latest
-    container_name: dmi-gs-db
     hostname: dmi-gs-db
     volumes:
       - ./.containers/gs/db:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - 57104:5432
     environment:
       - POSTGRES_DB=gameserver
       - POSTGRES_USER=postgres_gs
       - POSTGRES_PASSWORD=postgres_gs
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres_gs -d gameserver"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - game_server_infra
 
+  # GameBroker App
   dealmein.gamebroker.application:
     image: ${DOCKER_REGISTRY-}dealmeingamebrokerapplication
+    hostname: dmi-gb-app
     build:
       context: .
       dockerfile: src/DealMeIn.GameBroker.Application/Dockerfile
@@ -50,14 +69,14 @@ services:
       - game_broker_infra
       - services
 
+  # GameBroker Postgres
   dealmein.gamebroker.postgres:
     image: postgres:latest
-    container_name: dmi-gb-db
     hostname: dmi-gb-db
     volumes:
       - ./.containers/gb/db:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - 57202:5432
     environment:
       - POSTGRES_DB=gamebroker
       - POSTGRES_USER=postgres_gb
@@ -65,8 +84,37 @@ services:
     networks:
       - game_broker_infra
 
+  # Kong Gateway
+  dealmein.kong.gateway:
+    hostname: dmi-kong
+    image: kong/kong-gateway:3.5.0.3
+    volumes:
+      - ./.kong:/kong/declarative
+    ports:
+      - 80:8000
+      - 443:8443
+      - 8001:8001
+      - 8444:8444
+      - 8002:8002
+      - 8445:8445
+      - 8003:8003
+      - 8004:8004
+    environment:
+      - KONG_DATABASE=off
+      - KONG_DECLARATIVE_CONFIG=/kong/declarative/kong_conf.yml
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stdout
+      - KONG_ADMIN_ERROR_LOG=/dev/stdout
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001
+      - KONG_ADMIN_GUI_URL=http://localhost:8002
+    networks:
+      - kong-net
+      - services
 
 networks:
+  kong-net:
+    driver: bridge
   services:
     driver: bridge
   game_server_infra:

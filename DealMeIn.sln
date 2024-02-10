@@ -26,6 +26,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E01A72DF-D289-4C86-956E-3A9362F3E465}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Packages.props = Directory.Packages.props
+		.kong\kong_conf.yml = .kong\kong_conf.yml
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{A79647A4-8D6D-4389-A7D8-0A0B2ABC3DF6}"

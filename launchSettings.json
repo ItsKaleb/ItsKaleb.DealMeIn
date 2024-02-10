@@ -3,9 +3,16 @@
     "Docker Compose": {
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
+      "composeLaunchAction": "LaunchBrowser",
+      "composeLaunchServiceName": "dealmein.gameserver.application",
+      "composeLaunchUrl": "http://dealmein.local/gameserver/swagger",
       "serviceActions": {
         "dealmein.gameserver.application": "StartDebugging",
-        "dealmein.gamebroker.application": "StartDebugging"
+        "dealmein.gamebroker.application": "StartDebugging",
+        "dealmein.gamebroker.postgres": "StartWithoutDebugging",
+        "dealmein.gameserver.postgres": "StartWithoutDebugging",
+        "dealmein.gameserver.rabbitmq": "StartWithoutDebugging",
+        "dealmein.kong.gateway": "StartWithoutDebugging"
       }
     }
   }
